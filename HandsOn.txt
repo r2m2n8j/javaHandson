@@ -1,0 +1,189 @@
+package com.org.gen.day11question;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Scanner;
+
+
+public class AccountInfo {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+
+		Scanner scan = new Scanner(System.in);
+		
+Connection con = null;
+PreparedStatement pstmt = null;		
+		try{
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			System.out.println("Driver is loading...");
+			
+			con =DriverManager.getConnection("jdbc:mysql://localhost:3306/genpact","root","Anuj");
+			System.out.println(" Connecting to DB ");
+			
+			 pstmt = con.prepareStatement("select *from genpact.bank_account");
+			System.out.println("Query exceution env is ready...");
+			ResultSet rs = pstmt.executeQuery();
+			
+			System.out.println("Enter your bank_acount to withdrawl your amount ");
+			String bankAc= scan.nextLine();
+			int availableBalance=0;
+
+			System.out.println(" Data ");
+			while(rs.next()){
+				if(rs.getString(1).equals(bankAc)){
+					availableBalance=rs.getInt(4);
+				
+					System.out.println(rs.getString(1)+ "  "+ rs.getString(2)+ "  "+rs.getString(3)+"  "+ rs.getInt(4));
+				}
+			}
+			
+			pstmt.close();
+			
+			 pstmt =con.prepareStatement("update genpact.bank_account set available_balance = ? where account_number=?");
+			
+			System.out.println(availableBalance);
+			if(availableBalance>1000){
+				System.out.println(" Enter the amount for withdrawl :: ");
+				int amount =scan.nextInt();
+				if( amount<availableBalance){
+				
+				System.out.println(" after .. ");
+				pstmt.setInt(1, (availableBalance-amount));
+				pstmt.setString(2, bankAc);
+				pstmt.executeUpdate();
+				
+				System.out.println("After withdrawl Update In Bank Account where acNo = "+bankAc);
+//				pstmt.close();
+				}
+			}else{
+				System.out.println("your amount is less than 1000 No withdrawl this time ....");
+			}
+				System.out.println("would you like to enter amount \n Enter Y and N");
+				String s = scan.next();
+				if("Y".equalsIgnoreCase(s)){
+					System.out.println("Enter amount for deposit ");
+					int amount = scan.nextInt();
+					
+					pstmt.setInt(1, (availableBalance+amount));
+					pstmt.setString(2, bankAc);
+					pstmt.executeUpdate();
+					
+					System.out.println("After deposit Update In Bank Account where acNo = "+bankAc);
+					pstmt.close();
+				}
+			
+			
+		}catch(ClassNotFoundException e){
+			System.out.println("Driver not load "+ e.getMessage());
+		}catch(SQLException e){
+			System.out.println("DB Error Exception "+e.getMessage());
+		}
+		catch(Exception e){
+			
+		}finally{
+			if(con!=null){
+				try{
+					con.close(); //5
+				}catch(Exception e){
+					System.out.println("DB connection clossing error "+e.getMessage());
+				}
+			}
+		}
+		System.out.println(" out ");
+		
+		
+	}
+
+}
+
+
+**************************************************************************************************
+
+
+package com.org.gen.day11question;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Scanner;
+
+public class Developer {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+
+		Scanner scan = new Scanner(System.in);
+Connection con = null;
+PreparedStatement pstmt = null;
+		
+		try{
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			System.out.println("Driver is loading...");
+			
+			con =DriverManager.getConnection("jdbc:mysql://localhost:3306/genpact","root","Anuj");
+			System.out.println(" Connecting to DB ");
+			
+			 pstmt = con.prepareStatement("select *from genpact.bank_account");
+			System.out.println("Query exceution env is ready...");
+			
+			ResultSet rs = pstmt.executeQuery();
+			System.out.println(" Data ");
+			while(rs.next()){
+				System.out.println(rs.getString(1)+ "  "+ rs.getString(2)+ "  "+ rs.getString(3)+" "+rs.getInt(4));
+			}
+			System.out.println("For new Customer ");
+			System.out.println(" Enter Account No ");
+			String accountNo=scan.next();
+			System.out.println(" Enter name ");
+			String name = scan.next();
+			System.out.println("Enter Phone ");
+			String phone = scan.next();
+			System.out.println(" Enter amount ");
+			int amount = scan.nextInt();
+			
+			pstmt = con.prepareStatement("insert into genpact.bank_account values(?,?,?,?)");
+			
+			pstmt.setString(1, accountNo);
+			pstmt.setString(2, name);
+			pstmt.setString(3,phone);
+			pstmt.setInt(4, amount);
+			pstmt.executeUpdate();
+		
+			System.out.println(" update new column ");
+		
+			
+		pstmt.close();	
+		}catch(ClassNotFoundException e){
+			System.out.println("Driver not load "+ e.getMessage());
+		}catch(SQLException e){
+			System.out.println("DB Error Exception "+e.getMessage());
+		}
+		catch(Exception e){
+			
+		}finally{
+			if(con!=null){
+				try{
+					con.close(); //5
+				}catch(Exception e){
+					System.out.println("DB connection clossing error "+e.getMessage());
+				}
+			}
+		}
+		System.out.println(" out ");
+		
+	}
+
+}
+
+
+
+
+
+
